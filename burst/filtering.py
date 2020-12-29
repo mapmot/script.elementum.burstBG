@@ -4,7 +4,7 @@
 Burst filtering class and methods
 """
 
-from __future__ import unicode_literals
+
 from future.utils import PY3
 
 import re
@@ -15,7 +15,7 @@ from .providers.definitions import definitions
 from .utils import Magnet, get_int, get_float, clean_number, size_int, get_alias
 if PY3:
     import html
-    unicode = str
+    str = str
 else:
     from .parser.HTMLParser import HTMLParser
 
@@ -24,7 +24,7 @@ from kodi_six.utils import py2_encode
 try:
     from collections import OrderedDict
 except ImportError:
-    from ordereddict import OrderedDict
+    from .ordereddict import OrderedDict
 
 
 class Filtering:
@@ -141,17 +141,17 @@ class Filtering:
         self.releases_deny = releases_deny
 
         if get_setting('additional_filters', bool):
-            accept = get_setting('accept', unicode).strip().lower()
+            accept = get_setting('accept', str).strip().lower()
             if accept:
                 accept = re.split(r',\s?', accept)
                 releases_allow.extend(accept)
 
-            block = get_setting('block', unicode).strip().lower()
+            block = get_setting('block', str).strip().lower()
             if block:
                 block = re.split(r',\s?', block)
                 releases_deny.extend(block)
 
-            require = get_setting('require', unicode).strip().lower()
+            require = get_setting('require', str).strip().lower()
             if require:
                 require = re.split(r',\s?', require)
 
@@ -191,7 +191,7 @@ class Filtering:
         general_query = definition['general_query'] if definition['general_query'] else ''
         log.debug("[%s] General URL: %s%s" % (provider, definition['base_url'], general_query))
         self.info = payload
-        self.url = u"%s%s" % (definition['base_url'], general_query)
+        self.url = "%s%s" % (definition['base_url'], general_query)
         if definition['general_keywords']:
             self.queries = [definition['general_keywords']]
             self.extras = [definition['general_extra']]
@@ -218,7 +218,7 @@ class Filtering:
             self.max_size = get_float(get_setting('max_size_movies'))
             self.check_sizes()
         self.info = payload
-        self.url = u"%s%s" % (definition['base_url'], movie_query)
+        self.url = "%s%s" % (definition['base_url'], movie_query)
         if definition['movie_keywords']:
             self.queries = ["%s" % definition['movie_keywords']]
             self.extras = ["%s" % definition['movie_extra']]
@@ -248,7 +248,7 @@ class Filtering:
             self.max_size = get_float(get_setting('max_size_episodes'))
             self.check_sizes()
         self.info = payload
-        self.url = u"%s%s" % (definition['base_url'], show_query)
+        self.url = "%s%s" % (definition['base_url'], show_query)
         if definition['tv_keywords']:
             self.queries = ["%s" % definition['tv_keywords']]
             self.extras = ["%s" % definition['tv_extra'] if 'tv_extra' in definition and definition['tv_extra'] else '']
@@ -282,7 +282,7 @@ class Filtering:
             self.max_size = get_float(get_setting('max_size_seasons'))
             self.check_sizes()
         self.info = info
-        self.url = u"%s%s" % (definition['base_url'], season_query)
+        self.url = "%s%s" % (definition['base_url'], season_query)
         if definition['season_keywords']:
             self.queries = ["%s" % definition['season_keywords']]
             self.extras = ["%s" % definition['season_extra'] if definition['season_extra'] else '']
@@ -312,7 +312,7 @@ class Filtering:
             self.max_size = get_float(get_setting('max_size_episodes'))
             self.check_sizes()
         self.info = info
-        self.url = u"%s%s" % (definition['base_url'], anime_query)
+        self.url = "%s%s" % (definition['base_url'], anime_query)
         if self.info['absolute_number']:
             self.info['episode'] = self.info['absolute_number']
         if definition['anime_keywords']:
@@ -393,7 +393,7 @@ class Filtering:
                     except Exception as e:
                         import traceback
                         log.error("%s failed with: %s" % (provider, repr(e)))
-                        map(log.debug, traceback.format_exc().split("\n"))
+                        list(map(log.debug, traceback.format_exc().split("\n")))
                 text = text.replace('{%s}' % keyword, title)
 
             if 'year' in keyword:
@@ -422,7 +422,7 @@ class Filtering:
                 text = text.replace('{%s}' % keyword, episode)
 
         if replacing:
-            text = text.replace(u"'", '')
+            text = text.replace("'", '')
 
         return text
 
@@ -454,7 +454,7 @@ class Filtering:
                 return False
 
         if self.filter_title:
-            if not all(map(lambda match: match in name, re.split(r'\s', self.title))):
+            if not all([match in name for match in re.split(r'\s', self.title)]):
                 self.reason += " Name mismatch"
                 return False
 
@@ -638,7 +638,7 @@ def cleanup_results(results_list):
             except Exception as e:
                 import traceback
                 log.warning("%s logging failed with: %s" % (result['provider'], repr(e)))
-                map(log.debug, traceback.format_exc().split("\n"))
+                list(map(log.debug, traceback.format_exc().split("\n")))
             continue
 
         hash_ = result['info_hash'].upper()

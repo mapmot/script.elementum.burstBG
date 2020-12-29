@@ -7,7 +7,7 @@
     Normalization strings to Unicode
 """
 
-from __future__ import unicode_literals
+
 from future.builtins import range, chr
 from future.utils import PY3
 
@@ -17,9 +17,9 @@ import unicodedata
 if PY3:
     from urllib.parse import unquote
     import html
-    unicode = str
+    str = str
 else:
-    from urllib import unquote
+    from urllib.parse import unquote
     from .parser.HTMLParser import HTMLParser
 from kodi_six import py2_encode, py2_decode
 
@@ -32,7 +32,7 @@ def clean_title(string=None):
     :rtype: unicode
     """
     if string:
-        string = re.sub(r'\((.*?)\)', u'', string).strip()
+        string = re.sub(r'\((.*?)\)', '', string).strip()
 
     return string
 
@@ -62,12 +62,12 @@ def remove_accents(string):
     :return: string without accents
     :rtype: unicode
     """
-    if not isinstance(string, unicode):
+    if not isinstance(string, str):
         string = normalize_string(string)
 
     nfkd_form = unicodedata.normalize('NFKD', string)
     only_ascii = py2_encode(nfkd_form, 'ASCII', 'ignore').strip()
-    return string if only_ascii == u'' else only_ascii
+    return string if only_ascii == '' else only_ascii
 
 
 def remove_control_chars(string):
@@ -79,9 +79,9 @@ def remove_control_chars(string):
     :rtype: unicode
     """
     control_chars = ''.join(map(chr, list(range(0, 32)) + list(range(127, 160))))
-    control_char_re = re.compile(u'[%s]' % re.escape(control_chars))
+    control_char_re = re.compile('[%s]' % re.escape(control_chars))
     tem_string = control_char_re.sub('', string)
-    control_char_re = re.compile(u'[%s]' % re.escape(chr(160)))
+    control_char_re = re.compile('[%s]' % re.escape(chr(160)))
     return control_char_re.sub(' ', tem_string)
 
 
@@ -95,27 +95,27 @@ def safe_name_torrent(string):
     """
     # erase keyword
     string = string.lower()
-    string = re.sub(u'^\[.*?\]', u'', string)  # erase [HorribleSub] for ex.
+    string = re.sub('^\[.*?\]', '', string)  # erase [HorribleSub] for ex.
     # check for anime
-    string = re.sub(u'- ([0-9][0-9][0-9][0-9]) ', u' \g<1>', string + u' ')
-    string = re.sub(u'- ([0-9]+) ', u'- EP\g<1>', string + u' ')
+    string = re.sub('- ([0-9][0-9][0-9][0-9]) ', ' \g<1>', string + ' ')
+    string = re.sub('- ([0-9]+) ', '- EP\g<1>', string + ' ')
     if 'season' not in string.lower():
-        string = string.lower().replace(u' episode ', u' - EP')
+        string = string.lower().replace(' episode ', ' - EP')
 
     # check for qualities
-    string = string.replace(u'1920x1080', u'1080p')
-    string = string.replace(u'1280x720', u'720p')
-    string = string.replace(u'853x480', u'480p')
-    string = string.replace(u'848x480', u'480p')
-    string = string.replace(u'704x480', u'480p')
-    string = string.replace(u'640x480', u'480p')
-    string = string.replace(u'microhd', u' microhd')  # sometimes comes with the year
-    string = string.replace(u'dvdrip', u' dvdrip')  # sometimes comes with the year
-    string = string.replace(u'1080p', u'')
-    string = string.replace(u'720p', u'')
-    string = string.replace(u'480p', u'')
+    string = string.replace('1920x1080', '1080p')
+    string = string.replace('1280x720', '720p')
+    string = string.replace('853x480', '480p')
+    string = string.replace('848x480', '480p')
+    string = string.replace('704x480', '480p')
+    string = string.replace('640x480', '480p')
+    string = string.replace('microhd', ' microhd')  # sometimes comes with the year
+    string = string.replace('dvdrip', ' dvdrip')  # sometimes comes with the year
+    string = string.replace('1080p', '')
+    string = string.replace('720p', '')
+    string = string.replace('480p', '')
     string = safe_name(string)
-    return string.replace(u's h i e l d', u'SHIELD').replace(u'c s i', u'CSI')
+    return string.replace('s h i e l d', 'SHIELD').replace('c s i', 'CSI')
 
 
 def safe_name(string, charset='utf-8', replacing=False):
@@ -132,12 +132,12 @@ def safe_name(string, charset='utf-8', replacing=False):
     """
     string = normalize_string(string, charset, replacing)
     string = string.lower().title()
-    keys = {u'*': u' ', u'/': u' ', u':': u' ', u'<': u' ', u'>': u' ', u'?': u' ', u'|': u' ', u'_': u' ',
-            u'.': u' ', u')': u' ', u'(': u' ', u'[': u' ', u']': u' ', u'-': u' '}
-    for key in keys.keys():
+    keys = {'*': ' ', '/': ' ', ':': ' ', '<': ' ', '>': ' ', '?': ' ', '|': ' ', '_': ' ',
+            '.': ' ', ')': ' ', '(': ' ', '[': ' ', ']': ' ', '-': ' '}
+    for key in list(keys.keys()):
         string = string.replace(key, keys[key])
 
-    string = re.sub(u' +', u' ', string)
+    string = re.sub(' +', ' ', string)
     return string
 
 
@@ -153,39 +153,39 @@ def normalize_string(string, charset=None, replacing=False):
     :return: converted unicode
     :rtype: unicode
     """
-    if not isinstance(string, unicode):
+    if not isinstance(string, str):
         try:
-            if re.search(u'=[0-9a-fA-F]{2}', string):
+            if re.search('=[0-9a-fA-F]{2}', string):
                 string = py2_decode(string, 'Quoted-printable')
 
-            string = json.loads(u'%s' % string, encoding=charset)
+            string = json.loads('%s' % string, encoding=charset)
 
         except ValueError:
             try:
-                string = unicode(eval(string), 'raw_unicode_escape')
+                string = str(eval(string), 'raw_unicode_escape')
 
             except (SyntaxError, NameError):
                 string = py2_decode(string, 'latin-1')
                 pass
 
             except TypeError:
-                string = unicode(string, errors='ignore')
+                string = str(string, errors='ignore')
                 pass
 
         except LookupError:
-            return u''
+            return ''
 
         except TypeError:
-            string = unicode(string, errors='ignore')
+            string = str(string, errors='ignore')
             pass
 
     string = remove_control_chars(string)
     string = fix_bad_unicode(string)
     string = unquote(string)
-    string = string.replace(u'<![CDATA[', u'').replace(u']]', u'')
+    string = string.replace('<![CDATA[', '').replace(']]', '')
     string = html.unescape(string)
     if replacing:
-        string = string.replace(u"'", '')
+        string = string.replace("'", '')
 
     string = string.lower()
 
@@ -258,7 +258,7 @@ def fix_bad_unicode(string):
         //>>> print fix_bad_unicode(u'This text was never Unicode at all\x85')
         This text was never Unicode at all…
     """
-    if not isinstance(string, unicode):
+    if not isinstance(string, str):
         raise TypeError("This isn't even decoded into Unicode yet. "
                         'Decode it first.')
     if len(string) == 0:
@@ -351,7 +351,7 @@ def text_badness(text):
     - Improbable single-byte characters, such as ƒ or ¬
     - Letters in somewhat rare scripts
     """
-    assert isinstance(text, unicode)
+    assert isinstance(text, str)
     errors = 0
     very_weird_things = 0
     weird_things = 0

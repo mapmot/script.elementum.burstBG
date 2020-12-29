@@ -59,7 +59,7 @@ class Attribute(dict):
         # """
 
         data = ''
-        for key, value in self.items():
+        for key, value in list(self.items()):
             pair = '%s="%s" ' % (key, value)
             data += pair
 
@@ -1107,7 +1107,7 @@ class Tree(object):
             count = 0
 
         # It pops all the items which do not match with the closing tag.
-        for i in xrange(0, count):
+        for i in range(0, count):
             self.stack.pop()
 
 

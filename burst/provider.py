@@ -9,7 +9,7 @@ from future.utils import PY3, iteritems
 import os
 import re
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from .client import Client
 from elementum.provider import log, get_setting, set_setting
 from .providers.definitions import definitions, longest
@@ -17,9 +17,9 @@ from .utils import ADDON_PATH, get_int, clean_size, get_alias
 from kodi_six import xbmc, xbmcaddon, py2_encode
 if PY3:
     from urllib.parse import quote
-    unicode = str
+    str = str
 else:
-    from urllib import quote
+    from urllib.parse import quote
 
 def generate_payload(provider, generator, filtering, verify_name=True, verify_size=True):
     """ Payload formatter to format results the way Elementum expects them
@@ -152,7 +152,7 @@ def process(provider, generator, filtering, has_special, verify_name=True, verif
                 payload[key] = filtering.post_data[key].replace('QUERY', query)
             else:
                 payload[key] = filtering.post_data[key]
-            payload[key] = urllib.unquote(payload[key])
+            payload[key] = urllib.parse.unquote(payload[key])
 
         # Creating the payload for GET method
         headers = None
@@ -206,9 +206,9 @@ def process(provider, generator, filtering, has_special, verify_name=True, verif
         elif token_auth:
             log.info("[%s] Reusing previous token authorization" % provider)
         elif 'private' in definition and definition['private']:
-            username = get_setting('%s_username' % provider, unicode)
-            password = get_setting('%s_password' % provider, unicode)
-            passkey = get_setting('%s_passkey' % provider, unicode)
+            username = get_setting('%s_username' % provider, str)
+            password = get_setting('%s_password' % provider, str)
+            passkey = get_setting('%s_passkey' % provider, str)
             if not username and not password and not passkey:
                 for addon_name in ('script.magnetic.%s' % provider, 'script.magnetic.%s-mc' % provider):
                     for setting in ('username', 'password'):

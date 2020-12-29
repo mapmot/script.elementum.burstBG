@@ -19,11 +19,11 @@ from .utils import encode_dict, translatePath
 if PY3:
     from http.cookiejar import LWPCookieJar
     from urllib.parse import urlparse, urlencode
-    unicode = str
+    str = str
 else:
-    from cookielib import LWPCookieJar
-    from urllib import urlencode
-    from urlparse import urlparse
+    from http.cookiejar import LWPCookieJar
+    from urllib.parse import urlencode
+    from urllib.parse import urlparse
 from kodi_six import xbmcaddon
 
 from requests.packages.urllib3.util.retry import Retry
@@ -131,8 +131,8 @@ class Client:
 
         global dns_public_list
         global dns_opennic_list
-        dns_public_list = get_setting("public_dns_list", unicode).replace(" ", "").split(",")
-        dns_opennic_list = get_setting("opennic_dns_list", unicode).replace(" ", "").split(",")
+        dns_public_list = get_setting("public_dns_list", str).replace(" ", "").split(",")
+        dns_opennic_list = get_setting("opennic_dns_list", str).replace(" ", "").split(",")
         # socket.setdefaulttimeout(60)
 
         # Parsing proxy information
@@ -140,10 +140,10 @@ class Client:
             'enabled': get_setting("proxy_enabled", bool),
             'use_type': get_setting("proxy_use_type", int),
             'type': proxy_types[0],
-            'host': get_setting("proxy_host", unicode),
+            'host': get_setting("proxy_host", str),
             'port': get_setting("proxy_port", int),
-            'login': get_setting("proxy_login", unicode),
-            'password': get_setting("proxy_password", unicode),
+            'login': get_setting("proxy_login", str),
+            'password': get_setting("proxy_password", str),
         }
 
         try:
@@ -305,11 +305,11 @@ class Client:
 
             import traceback
             log.error("%s failed with %s:" % (repr(url), repr(e)))
-            map(log.debug, traceback.format_exc().split("\n"))
+            list(map(log.debug, traceback.format_exc().split("\n")))
         except Exception as e:
             import traceback
             log.error("%s failed with %s:" % (repr(url), repr(e)))
-            map(log.debug, traceback.format_exc().split("\n"))
+            list(map(log.debug, traceback.format_exc().split("\n")))
 
         log.debug("Status for %s : %s" % (repr(url), str(self.status)))
 

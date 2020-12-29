@@ -14,7 +14,7 @@ from glob import glob
 if PY3:
     from urllib.parse import urlparse
 else:
-    from urlparse import urlparse
+    from urllib.parse import urlparse
     from io import open
 
 from elementum.provider import log
@@ -58,7 +58,7 @@ def load_providers(path, custom=False):
     except Exception as e:
         import traceback
         log.error("Failed importing providers from %s: %s", path, repr(e))
-        map(log.error, traceback.format_exc().split("\n"))
+        list(map(log.error, traceback.format_exc().split("\n")))
 
 
 def load_overrides(path, custom=False):
@@ -82,7 +82,7 @@ def load_overrides(path, custom=False):
     except Exception as e:
         import traceback
         log.error("Failed importing %soverrides: %s", "custom " if custom else "", repr(e))
-        map(log.error, traceback.format_exc().split("\n"))
+        list(map(log.error, traceback.format_exc().split("\n")))
 
 
 def update_definitions(provider, definition, custom=False):

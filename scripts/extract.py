@@ -8,7 +8,7 @@ import shutil
 import requests
 from time import sleep
 from zipfile import ZipFile
-from StringIO import StringIO
+from io import StringIO
 from threading import Thread
 from parse_magnetic import parse
 
@@ -45,7 +45,7 @@ if '--exclude-defs' in args:
     getting = "icons"
 if '--exclude-icons' in args and '--exclude-defs' in args:
     getting = "nothing"
-print("Getting %s for: %s" % (getting, repr(providers)))
+print(("Getting %s for: %s" % (getting, repr(providers))))
 if getting == 'nothing':
     raise Exception("Nothing to extract...")
 
@@ -62,18 +62,18 @@ def extract_magnetic(provider):
     last_version = re.findall(r".*version=\"(.*)\"[\s\r\n].*", addon_xml)[1]
 
     last_zip = "%s/script.magnetic.%s/script.magnetic.%s-%s.zip" % (repo, provider, provider, last_version)
-    print("Getting: %s..." % last_zip)
+    print(("Getting: %s..." % last_zip))
 
     r = requests.get(last_zip, stream=True)
     if r.ok:
-        print("Got %s" % last_zip)
+        print(("Got %s" % last_zip))
         with ZipFile(StringIO(r.content)) as zf:
             if '--exclude-icons' not in args:
                 with zf.open(os.path.join('script.magnetic.%s' % provider, 'icon.png')) as icon:
                     target = open(os.path.join('burst', 'providers', 'icons', '%s.png' % new_provider), 'wb')
                     with icon, target:
                         shutil.copyfileobj(icon, target)
-                print("Extracted %s icon" % new_provider)
+                print(("Extracted %s icon" % new_provider))
             if '--exclude-defs' not in args:
                 main = zf.read(os.path.join('script.magnetic.%s' % provider, 'main.py'))
                 settings = zf.read(os.path.join('script.magnetic.%s' % provider, 'resources', 'settings.xml'))
@@ -100,10 +100,10 @@ if '--exclude-defs' not in args and '--print' not in args:
     save_path = os.path.join('burst', 'providers', 'definitions.json')
     with open(save_path, 'w') as defs:
         defs.write(json.dumps(definitions, indent=4, sort_keys=True, separators=(',', ': ')) + "\n")
-    print("Extracted %d providers and wrote definitions to %s" % (len(definitions), save_path))
+    print(("Extracted %d providers and wrote definitions to %s" % (len(definitions), save_path)))
 elif '--print' in args:
-    print(json.dumps(definitions, indent=4, sort_keys=True, separators=(',', ': ')))
-    print
+    print((json.dumps(definitions, indent=4, sort_keys=True, separators=(',', ': '))))
+    print()
     print("Sample settings:")
     for provider in definitions:
-        print('<setting label="%s" id="use_%s" type="bool" default="false" />' % (definitions[provider]['name'], provider))
+        print(('<setting label="%s" id="use_%s" type="bool" default="false" />' % (definitions[provider]['name'], provider)))

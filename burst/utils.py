@@ -12,10 +12,10 @@ from elementum.provider import get_setting
 from .providers.definitions import definitions, translatePath
 if PY3:
     from urllib.parse import urlparse
-    basestring = str
-    unicode = str
+    str = str
+    str = str
 else:
-    from urlparse import urlparse
+    from urllib.parse import urlparse
 from kodi_six import xbmcgui, xbmcaddon
 
 ADDON = xbmcaddon.Addon()
@@ -95,14 +95,14 @@ def get_alias(definition, alias):
 
             # Substitute all ocurrences of old domain name and replace with new one
             for k in definition:
-                if isinstance(definition[k], basestring):
+                if isinstance(definition[k], str):
                     definition[k] = definition[k].replace(old_domain, new_domain)
                     if protocol:
                         definition[k] = definition[k].replace("http://", protocol + "://")
                         definition[k] = definition[k].replace("https://", protocol + "://")
 
             for k in definition["parser"]:
-                if isinstance(definition["parser"][k], basestring):
+                if isinstance(definition["parser"][k], str):
                     definition["parser"][k] = definition["parser"][k].replace(old_domain, new_domain)
                     if protocol:
                         definition["parser"][k] = definition["parser"][k].replace("http://", protocol + "://")
@@ -190,7 +190,7 @@ def get_int(string):
         except:
             pass
     try:
-        return int(filter(type(string).isdigit, string))
+        return int(list(filter(type(string).isdigit, string)))
     except:
         return 0
 
@@ -217,11 +217,11 @@ def get_float(string):
             pass
     try:
         string = string[:clean_number(string).find('.')]
-        return float(filter(type(string).isdigit, string))
+        return float(list(filter(type(string).isdigit, string)))
     except:
         pass
     try:
-        return float(filter(type(string).isdigit, string))
+        return float(list(filter(type(string).isdigit, string)))
     except:
         return float(0)
 
@@ -344,7 +344,7 @@ def encode_dict(dict_in, charset='utf8'):
     try:
         dict_out = {}
         for k, v in iteritems(dict_in):
-            if PY2 and isinstance(v, unicode):
+            if PY2 and isinstance(v, str):
                 v = v.encode('utf8')
             elif PY2 and isinstance(v, str):
                 v = v.decode('utf8')

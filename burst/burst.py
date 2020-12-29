@@ -4,7 +4,7 @@
 Burst processing thread
 """
 
-from __future__ import unicode_literals
+
 from future.utils import PY3, iteritems
 
 import re
@@ -16,12 +16,12 @@ if PY3:
     from queue import Queue
     from urllib.parse import urlparse
     from urllib.parse import unquote
-    basestring = str
+    str = str
     long = int
 else:
-    from Queue import Queue
-    from urlparse import urlparse
-    from urllib import unquote
+    from queue import Queue
+    from urllib.parse import urlparse
+    from urllib.parse import unquote
 from .parser.ehp import Html
 from kodi_six import xbmc, xbmcgui, xbmcaddon, py2_encode
 
@@ -266,7 +266,7 @@ def extract_torrents(provider, client):
             except Exception as e:
                 import traceback
                 log.error("[%s] Subpage logging failed with: %s" % (provider, repr(e)))
-                map(log.debug, traceback.format_exc().split("\n"))
+                list(map(log.debug, traceback.format_exc().split("\n")))
 
             # New client instance, otherwise it's race conditions all over the place
             subclient = Client()
@@ -296,7 +296,7 @@ def extract_torrents(provider, client):
                 except Exception as e:
                     import traceback
                     log.error("[%s] Subpage extraction for %s failed with: %s" % (provider, repr(uri[0]), repr(e)))
-                    map(log.debug, traceback.format_exc().split("\n"))
+                    list(map(log.debug, traceback.format_exc().split("\n")))
 
             log.debug("[%s] Subpage torrent for %s: %s" % (provider, repr(uri[0]), torrent))
             ret = (name, info_hash, torrent, size, seeds, peers)
@@ -494,17 +494,17 @@ def extract_from_api(provider, client):
             name = "%s - %s" % (name, result[api_format['quality']])
         if 'size' in api_format:
             size = result[api_format['size']]
-            if isinstance(size, (long, int)):
+            if isinstance(size, int):
                 size = sizeof(size)
-            elif isinstance(size, basestring) and size.isdigit():
+            elif isinstance(size, str) and size.isdigit():
                 size = sizeof(int(size))
         if 'seeds' in api_format:
             seeds = result[api_format['seeds']]
-            if isinstance(seeds, basestring) and seeds.isdigit():
+            if isinstance(seeds, str) and seeds.isdigit():
                 seeds = int(seeds)
         if 'peers' in api_format:
             peers = result[api_format['peers']]
-            if isinstance(peers, basestring) and peers.isdigit():
+            if isinstance(peers, str) and peers.isdigit():
                 peers = int(peers)
         yield (name, info_hash, torrent, size, seeds, peers)
 

@@ -36,7 +36,7 @@ languages = {
 
 def char_range(c1, c2):
     """Generates the characters from `c1` to `c2`, inclusive."""
-    for c in xrange(ord(c1), ord(c2)+1):
+    for c in range(ord(c1), ord(c2)+1):
         yield chr(c)
 
 def cleanup_settings(path):
@@ -44,7 +44,7 @@ def cleanup_settings(path):
     global public
     global private
 
-    print("Cleaning settings at %s" % (path))
+    print(("Cleaning settings at %s" % (path)))
     try:
         with open(path) as file:
             settings = file.read()
@@ -52,7 +52,7 @@ def cleanup_settings(path):
         settings = re.sub(r"(<!-- Providers-\w+-\d-Begin -->).*?(<!-- Providers-\w+-\d-End -->)", "\\1\n    \\2", settings, flags=re.DOTALL)
 
     except Exception as e:
-        print("Failed removing settings from %s: %s" % (path, repr(e)))
+        print(("Failed removing settings from %s: %s" % (path, repr(e))))
 
 
 def load_providers(path):
@@ -60,7 +60,7 @@ def load_providers(path):
     global public
     global private
 
-    print("Loading providers from %s" % (path))
+    print(("Loading providers from %s" % (path)))
     try:
         with open(path) as file:
             providers = json.load(file)
@@ -68,7 +68,7 @@ def load_providers(path):
         # Setting default values for each provider
         # to avoid missing dict items
         for provider in providers:
-            for k, v in mandatory_fields.iteritems():
+            for k, v in mandatory_fields.items():
                 if k not in providers[provider]:
                     providers[provider][k] = v
 
@@ -86,7 +86,7 @@ def load_providers(path):
                 public.append(providers[provider])
 
     except Exception as e:
-        print("Failed importing providers from %s: %s" % (path, repr(e)))
+        print(("Failed importing providers from %s: %s" % (path, repr(e))))
 
 
 def store_providers(path):
@@ -107,7 +107,7 @@ def store_providers(path):
     public_count = 0
     private_count = 0
 
-    print("Saving providers to %s" % (path))
+    print(("Saving providers to %s" % (path)))
 
     for p in public:
         public_count += 1
@@ -168,10 +168,10 @@ def store_providers(path):
         with open(path, 'w') as file:
             file.write(settings)
             file.close()
-            print("Saved %d public, %d private providers to %s" % (public_count, private_count, path))
+            print(("Saved %d public, %d private providers to %s" % (public_count, private_count, path)))
 
     except Exception as e:
-        print("Failed removing settings from %s: %s" % (path, repr(e)))
+        print(("Failed removing settings from %s: %s" % (path, repr(e))))
 
 def get_languages(langs):
     if not langs:
